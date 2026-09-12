@@ -57,10 +57,10 @@ class Order {
       deliveryAddress: map['DeliveryAddress'],
       phoneNumber: map['PhoneNumber'],
       paymentMethod: map['PaymentMethod'],
-      subTotal: map['SubTotal'],
-      deliveryFee: map['DeliveryFee'],
-      discount: map['Discount'],
-      orderTotal: map['OrderTotal'],
+      subTotal: (map['SubTotal'] as num).toDouble(),
+      deliveryFee: (map['DeliveryFee'] as num).toDouble(),
+      discount: (map['Discount'] as num).toDouble(),
+      orderTotal: (map['OrderTotal'] as num).toDouble(),
       orderStatus: map['OrderStatus'],
     );
   }

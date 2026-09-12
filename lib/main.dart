@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/customer_home_page.dart';
+import 'screens/root_page.dart';
 
 void main() {
   runApp(const BookstoreApp());
@@ -27,7 +27,7 @@ class BookstoreApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const CustomerHomePage(),
+      home: const RootPage(),
     );
   }
 }

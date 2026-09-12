@@ -617,4 +617,24 @@ CREATE TABLE OrderItem (
       'items': orderItems,
     };
   }
+
+  Future<int> getOrdersCountByStatus(String status) async {
+    final db = await instance.database;
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM CustomerOrder WHERE OrderStatus = ?', [status]),
+    );
+    return count ?? 0;
+  }
+
+  Future<List<Order>> getOrdersByStatus(String status) async {
+    final db = await instance.database;
+    final orderMaps = await db.query(
+      'CustomerOrder',
+      where: 'OrderStatus = ?',
+      whereArgs: [status],
+      orderBy: 'OrderDate DESC',
+    );
+
+    return orderMaps.map((map) => Order.fromMap(map)).toList();
+  }
 }

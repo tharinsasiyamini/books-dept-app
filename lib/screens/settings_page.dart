@@ -3,6 +3,8 @@ import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../state/auth_state.dart';
 import 'customer_home_page.dart';
+import 'root_page.dart';
+import 'login_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -47,22 +49,30 @@ class SettingsPage extends StatelessWidget {
                         ],
                       );
                     }
-                    // Show all options when logged in
+                    
+                    final role = AuthState.currentUser?.role ?? 'Customer';
+                    final isStaff = role == 'Store Staff';
+
+                    // Show options based on role
                     return Column(
                       children: [
-                        _buildSettingItem(context, Icons.person_outline, 'Account Type', trailingText: 'Customer'),
-                        _buildSettingItem(context, Icons.phone_outlined, 'Phone Number', trailingText: '+94 074 221 4587'),
-                        _buildSettingItem(context, Icons.notifications_none, 'Notification'),
-                        _buildSettingItem(context, Icons.lock_outline, 'Change Password'),
-                        _buildSettingItem(context, Icons.person_add_outlined, 'Add Account'),
-                        _buildSettingItem(context, Icons.description_outlined, 'Terms & Conditions'),
+                        _buildSettingItem(context, Icons.person_outline, 'Account Type', trailingText: role),
+                        if (!isStaff) ...[
+                          _buildSettingItem(context, Icons.phone_outlined, 'Phone Number', trailingText: '+94 074 221 4587'),
+                          _buildSettingItem(context, Icons.notifications_none, 'Notification'),
+                          _buildSettingItem(context, Icons.lock_outline, 'Change Password'),
+                          _buildSettingItem(context, Icons.person_add_outlined, 'Add Account'),
+                          _buildSettingItem(context, Icons.description_outlined, 'Terms & Conditions'),
+                        ],
                         _buildSettingItem(context, Icons.logout, 'Logout', isLogout: true, onTap: () {
                           AuthState.logout();
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (context) => const CustomerHomePage()),
+                            MaterialPageRoute(builder: (context) => const RootPage()),
                             (route) => false,
                           );
+                          // Push Login Page so user can immediately sign in again
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
                         }),
                       ],
                     );
@@ -72,11 +82,12 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           
-          // Bottom Navigation Bar
-          const Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomBottomNavBar(),
-          ),
+          // Bottom Navigation Bar (Hidden for Staff)
+          if (AuthState.currentUser?.role != 'Store Staff')
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: CustomBottomNavBar(),
+            ),
         ],
       ),
     );
