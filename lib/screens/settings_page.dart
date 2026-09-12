@@ -6,6 +6,8 @@ import 'customer_home_page.dart';
 import 'root_page.dart';
 import 'login_page.dart';
 
+import 'customer_notification_page.dart';
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -44,14 +46,16 @@ class SettingsPage extends StatelessWidget {
                       // Show only Notification and Terms & Conditions when logged out
                       return Column(
                         children: [
-                          _buildSettingItem(context, Icons.notifications_none, 'Notification'),
+                          _buildSettingItem(context, Icons.notifications_none, 'Notification', onTap: () {
+                             Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerNotificationPage()));
+                          }),
                           _buildSettingItem(context, Icons.description_outlined, 'Terms & Conditions'),
                         ],
                       );
                     }
                     
                     final role = AuthState.currentUser?.role ?? 'Customer';
-                    final isStaff = role == 'Store Staff';
+                    final isStaff = role.toLowerCase().contains('staff');
 
                     // Show options based on role
                     return Column(
@@ -59,7 +63,9 @@ class SettingsPage extends StatelessWidget {
                         _buildSettingItem(context, Icons.person_outline, 'Account Type', trailingText: role),
                         if (!isStaff) ...[
                           _buildSettingItem(context, Icons.phone_outlined, 'Phone Number', trailingText: '+94 074 221 4587'),
-                          _buildSettingItem(context, Icons.notifications_none, 'Notification'),
+                          _buildSettingItem(context, Icons.notifications_none, 'Notification', onTap: () {
+                             Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerNotificationPage()));
+                          }),
                           _buildSettingItem(context, Icons.lock_outline, 'Change Password'),
                           _buildSettingItem(context, Icons.person_add_outlined, 'Add Account'),
                           _buildSettingItem(context, Icons.description_outlined, 'Terms & Conditions'),

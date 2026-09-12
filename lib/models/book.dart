@@ -6,6 +6,7 @@ class Book {
   final String? imageURL;
   final String? description;
   final String? language;
+  final int stock;
 
   Book({
     required this.bookID,
@@ -15,6 +16,7 @@ class Book {
     this.imageURL,
     this.description,
     this.language,
+    this.stock = 20, // Default to 20 if not specified
   });
 
   // Convert a Book into a Map. The keys must correspond to the names of the
@@ -28,6 +30,7 @@ class Book {
       'ImageURL': imageURL,
       'Description': description,
       'Language': language,
+      'Stock': stock,
     };
   }
 
@@ -41,6 +44,7 @@ class Book {
       imageURL: map['ImageURL'] as String?,
       description: map['Description'] as String?,
       language: map['Language'] as String?,
+      stock: map['Stock'] as int? ?? 20,
     );
   }
 

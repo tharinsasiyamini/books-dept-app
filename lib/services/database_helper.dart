@@ -6,6 +6,7 @@ import '../models/cart.dart';
 import '../models/cart_item.dart';
 import '../models/order.dart';
 import '../models/order_item.dart';
+import '../models/notification.dart';
 import 'dart:math' as math;
 
 class DatabaseHelper {
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS OrderItem (
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onConfigure: _onConfigure,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
@@ -118,6 +119,22 @@ CREATE TABLE OrderItem (
 )
 ''');
     }
+
+    if (oldVersion < 3) {
+      await db.execute('''
+ALTER TABLE Book ADD COLUMN Stock INTEGER NOT NULL DEFAULT 20;
+''');
+      await db.execute('''
+CREATE TABLE Notification (
+  NotificationID TEXT PRIMARY KEY,
+  UserID TEXT NOT NULL,
+  Message TEXT NOT NULL,
+  Date TEXT NOT NULL,
+  IsRead INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE
+)
+''');
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -129,7 +146,8 @@ CREATE TABLE Book (
   Price REAL NOT NULL,
   ImageURL TEXT,
   Description TEXT,
-  Language TEXT
+  Language TEXT,
+  Stock INTEGER NOT NULL DEFAULT 20
 )
 ''');
 
@@ -194,6 +212,17 @@ CREATE TABLE OrderItem (
 )
 ''');
 
+    await db.execute('''
+CREATE TABLE Notification (
+  NotificationID TEXT PRIMARY KEY,
+  UserID TEXT NOT NULL,
+  Message TEXT NOT NULL,
+  Date TEXT NOT NULL,
+  IsRead INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE
+)
+''');
+
     // Insert initial books
     final initialBooks = [
       {
@@ -201,24 +230,28 @@ CREATE TABLE OrderItem (
         'Title': 'Charlie and the Chocolate Factory',
         'Author': 'Roald Dahl',
         'Price': 1500.00,
+        'Stock': 20,
       },
       {
         'BookID': 'B02',
         'Title': 'Madol Duwa',
         'Author': 'Martin Wickramasinghe',
         'Price': 2000.00,
+        'Stock': 20,
       },
       {
         'BookID': 'B03',
         'Title': 'Hath Pana',
         'Author': null,
         'Price': 1900.00,
+        'Stock': 20,
       },
       {
         'BookID': 'B04',
         'Title': 'Twilight New Moon',
         'Author': 'Stephenie Meyer',
         'Price': 2200.00,
+        'Stock': 20,
       },
       {
         'BookID': 'B05',
@@ -228,24 +261,28 @@ CREATE TABLE OrderItem (
         'Description':
             'Buy now Harry Potter and the Philosopher’s Stone from BooksDept Shop, Sri Lanka’s Number 1 Book Shop. J.K. Rowling’s beloved classic introduces readers to the magical world of Hogwarts, where young Harry Potter discovers his wizarding heritage, makes lifelong friends and faces thrilling adventures. Filled with wonder, imagination and unforgettable characters, Harry Potter and the Philosopher’s Stone is perfect for children, teens, and adults who love fantasy and magical storytelling. This timeless tale sparks curiosity, courage, and the joy of reading for all ages.',
         'Language': 'English',
+        'Stock': 20,
       },
       {
         'BookID': 'B06',
         'Title': 'Harry Potter and the Chamber of Secrets',
         'Author': 'J.K. Rowling',
         'Price': 2400.00,
+        'Stock': 3, // Simulate low stock
       },
       {
         'BookID': 'B07',
         'Title': 'Harry Potter and the Goblet of Fire',
         'Author': 'J.K. Rowling',
         'Price': 2400.00,
+        'Stock': 20,
       },
       {
         'BookID': 'B08',
         'Title': 'Harry Potter and the Prisoner of Azkaban',
         'Author': 'J.K. Rowling',
         'Price': 2400.00,
+        'Stock': 20,
       }
     ];
 
@@ -636,5 +673,74 @@ CREATE TABLE OrderItem (
     );
 
     return orderMaps.map((map) => Order.fromMap(map)).toList();
+  }
+
+  Future<void> updateBookStock(String bookID, int newStock) async {
+    final db = await instance.database;
+    await db.update(
+      'Book',
+      {'Stock': newStock},
+      where: 'BookID = ?',
+      whereArgs: [bookID],
+    );
+  }
+
+  Future<void> updateOrderStatus(String orderID, String newStatus) async {
+    final db = await instance.database;
+    await db.update(
+      'CustomerOrder',
+      {'OrderStatus': newStatus},
+      where: 'OrderID = ?',
+      whereArgs: [orderID],
+    );
+  }
+
+  Future<void> createNotification(AppNotification notification) async {
+    final db = await instance.database;
+    await db.insert('Notification', notification.toMap());
+  }
+
+  Future<List<AppNotification>> getNotificationsForUser(String userID) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      'Notification',
+      where: 'UserID = ?',
+      whereArgs: [userID],
+      orderBy: 'Date DESC',
+    );
+    return maps.map((map) => AppNotification.fromMap(map)).toList();
+  }
+
+  Future<void> markNotificationsAsRead(String userID) async {
+    final db = await instance.database;
+    await db.update(
+      'Notification',
+      {'IsRead': 1},
+      where: 'UserID = ? AND IsRead = 0',
+      whereArgs: [userID],
+    );
+  }
+
+  Future<void> clearNotifications(String userID) async {
+    final db = await instance.database;
+    await db.delete(
+      'Notification',
+      where: 'UserID = ?',
+      whereArgs: [userID],
+    );
+  }
+
+  Future<int> getLowStockBooksCount() async {
+    final db = await instance.database;
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM Book WHERE Stock <= 5'),
+    );
+    return count ?? 0;
+  }
+
+  Future<List<Book>> getAllBooks() async {
+    final db = await instance.database;
+    final maps = await db.query('Book', orderBy: 'Title ASC');
+    return maps.map((map) => Book.fromMap(map)).toList();
   }
 }
