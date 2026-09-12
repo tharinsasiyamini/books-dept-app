@@ -340,11 +340,7 @@ CREATE TABLE Notification (
 
   Future<List<Book>> getHomeBooks() async {
     final db = await instance.database;
-    final maps = await db.query(
-      'Book',
-      where: 'BookID IN (?, ?, ?, ?)',
-      whereArgs: ['B01', 'B02', 'B03', 'B04'],
-    );
+    final maps = await db.query('Book');
     return maps.map((map) => Book.fromMap(map)).toList();
   }
 
@@ -388,6 +384,12 @@ CREATE TABLE Notification (
     );
     if (maps.isNotEmpty) return User.fromMap(maps.first);
     return null;
+  }
+
+  Future<List<User>> getAllUsers() async {
+    final db = await instance.database;
+    final maps = await db.query('User', orderBy: 'Role ASC, Name ASC');
+    return maps.map((map) => User.fromMap(map)).toList();
   }
 
   Future<User?> getUserById(String id) async {
@@ -736,6 +738,20 @@ CREATE TABLE Notification (
       await db.rawQuery('SELECT COUNT(*) FROM Book WHERE Stock <= 5'),
     );
     return count ?? 0;
+  }
+
+  Future<void> createBook(Book book) async {
+    final db = await instance.database;
+    await db.insert('Book', book.toMap());
+  }
+
+  Future<void> deleteBook(String bookID) async {
+    final db = await instance.database;
+    await db.delete(
+      'Book',
+      where: 'BookID = ?',
+      whereArgs: [bookID],
+    );
   }
 
   Future<List<Book>> getAllBooks() async {

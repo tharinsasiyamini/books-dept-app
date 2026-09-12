@@ -21,6 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   Future<void> _handleRegister() async {
     final firstName = _firstNameController.text.trim();
@@ -146,49 +148,59 @@ class _RegisterPageState extends State<RegisterPage> {
                     
                     // First Name Field
                     _buildTextField(
+                      context,
                       controller: _firstNameController,
                       hintText: 'First Name', 
-                      primaryColor: primaryColor,
+                      icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 16),
                     
                     // Last Name Field
                     _buildTextField(
+                      context,
                       controller: _lastNameController,
                       hintText: 'Last Name', 
-                      primaryColor: primaryColor,
+                      icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 16),
                     
                     // Email Field
                     _buildTextField(
+                      context,
                       controller: _emailController,
                       hintText: 'Email', 
-                      primaryColor: primaryColor,
-                      prefixIcon: Icons.email_outlined,
+                      icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 16),
                     
                     // Password Field
                     _buildTextField(
+                      context,
                       controller: _passwordController,
-                      hintText: 'Password', 
-                      primaryColor: primaryColor,
-                      prefixIcon: Icons.lock_outline,
-                      suffixIcon: Icons.visibility_outlined,
-                      obscureText: true,
+                      hintText: 'Password',
+                      icon: Icons.lock_outline,
+                      obscureText: _obscurePassword,
+                      onVisibilityToggle: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
                     
                     // Confirmation Password Field
                     _buildTextField(
+                      context,
                       controller: _confirmPasswordController,
-                      hintText: 'Confirmation Password', 
-                      primaryColor: primaryColor,
-                      prefixIcon: Icons.lock_outline,
-                      suffixIcon: Icons.visibility_outlined,
-                      obscureText: true,
+                      hintText: 'Confirm Password',
+                      icon: Icons.lock_outline,
+                      obscureText: _obscureConfirmPassword,
+                      onVisibilityToggle: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
                     ),
                     const SizedBox(height: 24),
                     
@@ -282,24 +294,34 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
-    required Color primaryColor,
-    IconData? prefixIcon,
-    IconData? suffixIcon,
+    required IconData icon,
+    TextInputType? keyboardType,
     bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
+    VoidCallback? onVisibilityToggle,
   }) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return TextField(
       controller: controller,
-      obscureText: obscureText,
       keyboardType: keyboardType,
+      obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: Colors.black) : null,
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Colors.black) : null,
-        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: prefixIcon == null ? 16 : 0),
+        prefixIcon: Icon(icon, color: Colors.black),
+        suffixIcon: onVisibilityToggle != null 
+          ? IconButton(
+              icon: Icon(
+                obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                color: Colors.black,
+              ),
+              onPressed: onVisibilityToggle,
+            )
+          : (obscureText ? const Icon(Icons.visibility_outlined, color: Colors.black) : null),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: primaryColor),

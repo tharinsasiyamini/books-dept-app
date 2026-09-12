@@ -5,6 +5,7 @@ import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'favorite_page.dart';
 import 'search_results_page.dart';
+import 'book_details_page.dart';
 import '../state/auth_state.dart';
 import '../services/database_helper.dart';
 
@@ -216,12 +217,21 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                             return BookCard(
                               book: _filteredBooks[index],
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("The Book Details are not yet Updated"),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
+                                if (_filteredBooks[index].description == null || _filteredBooks[index].description!.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("The Book Details are not yet Updated"),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BookDetailsPage(bookID: _filteredBooks[index].bookID),
+                                    ),
+                                  );
+                                }
                               },
                             );
                           },

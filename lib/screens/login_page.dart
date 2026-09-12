@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim().toLowerCase();
@@ -131,11 +132,21 @@ class _LoginPageState extends State<LoginPage> {
                 // Password Field
                 TextField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
-                    suffixIcon: const Icon(Icons.visibility_outlined, color: Colors.black),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        color: Colors.black,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),

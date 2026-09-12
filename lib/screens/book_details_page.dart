@@ -44,17 +44,8 @@ class BookDetailsPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                     padding: const EdgeInsets.all(16.0),
-                    child: Image.asset(
-                      book.localImagePath,
+                    child: book.buildImage(
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
-                          ),
-                        );
-                      },
                     ),
                   ),
                 ),

@@ -422,8 +422,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ],
               ),
-              child: Image.asset(
-                widget.cartItems[i].book.localImagePath,
+              child: widget.cartItems[i].book.buildImage(
                 width: 90,
                 height: 130,
                 fit: BoxFit.cover,

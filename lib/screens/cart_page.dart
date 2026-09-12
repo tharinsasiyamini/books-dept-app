@@ -189,8 +189,7 @@ class _CartPageState extends State<CartPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Book Image without border/card
-          Image.asset(
-            book.localImagePath,
+          book.buildImage(
             width: 100,
             height: 140,
             fit: BoxFit.cover,

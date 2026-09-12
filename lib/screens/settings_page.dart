@@ -56,12 +56,14 @@ class SettingsPage extends StatelessWidget {
                     
                     final role = AuthState.currentUser?.role ?? 'Customer';
                     final isStaff = role.toLowerCase().contains('staff');
+                    final isAdmin = role.toLowerCase().contains('admin');
+                    final isRestrictedRole = isStaff || isAdmin;
 
                     // Show options based on role
                     return Column(
                       children: [
                         _buildSettingItem(context, Icons.person_outline, 'Account Type', trailingText: role),
-                        if (!isStaff) ...[
+                        if (!isRestrictedRole) ...[
                           _buildSettingItem(context, Icons.phone_outlined, 'Phone Number', trailingText: '+94 074 221 4587'),
                           _buildSettingItem(context, Icons.notifications_none, 'Notification', onTap: () {
                              Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerNotificationPage()));
@@ -88,8 +90,8 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           
-          // Bottom Navigation Bar (Hidden for Staff)
-          if (AuthState.currentUser?.role != 'Store Staff')
+          // Bottom Navigation Bar (Hidden for Staff and Admin)
+          if (AuthState.currentUser?.role == 'Customer' || AuthState.currentUser?.role == null)
             const Align(
               alignment: Alignment.bottomCenter,
               child: CustomBottomNavBar(),

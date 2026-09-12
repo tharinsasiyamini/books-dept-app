@@ -150,8 +150,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Image.asset(
-                                        item.book.localImagePath,
+                                      item.book.buildImage(
                                         width: 40,
                                         height: 60,
                                         fit: BoxFit.cover,

@@ -40,19 +40,10 @@ class BookCard extends StatelessWidget {
                   color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                    child: Image.asset(
-                      book.localImagePath,
+                    child: book.buildImage(
                       width: double.infinity,
                       fit: BoxFit.contain,
                       alignment: Alignment.center,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, color: Colors.grey),
-                          ),
-                        );
-                      },
                     ),
                   ),
                 ),
