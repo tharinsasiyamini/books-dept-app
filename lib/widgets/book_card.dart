@@ -74,14 +74,31 @@ class BookCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        'LKR ${book.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 12, 
-                          fontWeight: FontWeight.w400,
+                      Expanded(
+                        child: Text(
+                          'LKR ${book.price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 11, 
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      const SizedBox(width: 4),
                       // Add to cart icon button
+                      if (AuthState.isLoggedIn.value && book.stock == 0)
+                        const Text(
+                          'Stock Out',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      else
                         GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () async {
@@ -131,21 +148,21 @@ class BookCard extends StatelessWidget {
                               );
                             }
                           },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black, width: 1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(
-                              Icons.shopping_cart_outlined,
-                              size: 16,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Icon(
+                                Icons.shopping_cart_outlined,
+                                size: 16,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../state/auth_state.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
-import 'login_page.dart';
+import 'root_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -94,9 +94,11 @@ class ProfilePage extends StatelessWidget {
                           title: const Text('Logout', style: TextStyle(color: Colors.red)),
                           onTap: () {
                             AuthState.logout();
-                            // Go back to Home as the root, then push Login Page
-                            Navigator.popUntil(context, (route) => route.isFirst);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                            Navigator.pushAndRemoveUntil(
+                              context, 
+                              MaterialPageRoute(builder: (context) => const RootPage()), 
+                              (route) => false
+                            );
                           },
                         ),
                       ],

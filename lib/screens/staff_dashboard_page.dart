@@ -212,7 +212,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                       onTap: () async {
                         await Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const StaffInventoryPage()),
+                          MaterialPageRoute(builder: (context) => const StaffInventoryPage(showOnlyLowStock: true)),
                         );
                         _loadDashboardData();
                       },

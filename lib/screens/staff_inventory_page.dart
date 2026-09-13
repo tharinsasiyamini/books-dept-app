@@ -4,7 +4,9 @@ import '../models/book.dart';
 import '../services/database_helper.dart';
 
 class StaffInventoryPage extends StatefulWidget {
-  const StaffInventoryPage({super.key});
+  final bool showOnlyLowStock;
+
+  const StaffInventoryPage({super.key, this.showOnlyLowStock = false});
 
   @override
   State<StaffInventoryPage> createState() => _StaffInventoryPageState();
@@ -35,8 +37,12 @@ class _StaffInventoryPageState extends State<StaffInventoryPage> {
       final books = await DatabaseHelper.instance.getAllBooks();
       if (mounted) {
         setState(() {
-          _allBooks = books;
-          _filteredBooks = books;
+          if (widget.showOnlyLowStock) {
+            _allBooks = books.where((b) => b.stock <= 5).toList();
+          } else {
+            _allBooks = books;
+          }
+          _filteredBooks = _allBooks;
           _isLoading = false;
         });
       }
@@ -127,7 +133,7 @@ class _StaffInventoryPageState extends State<StaffInventoryPage> {
                     child: _buildChip('Dashboard', false, primaryColor),
                   ),
                   const SizedBox(width: 16),
-                  _buildChip('Inventory', true, primaryColor),
+                  _buildChip(widget.showOnlyLowStock ? 'Low Stock' : 'Inventory', true, primaryColor),
                   const SizedBox(width: 16),
                   _buildChip('Orders', false, primaryColor), // Placeholder for orders
                 ],

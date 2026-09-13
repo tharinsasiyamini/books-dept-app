@@ -3,6 +3,7 @@ import '../models/book.dart';
 import '../services/database_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import 'admin_add_book_page.dart';
+import 'admin_edit_book_page.dart';
 import '../widgets/delete_confirmation_dialog.dart';
 
 class AdminBooksPage extends StatefulWidget {
@@ -153,9 +154,25 @@ class _AdminBooksPageState extends State<AdminBooksPage> {
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 28),
-                                onPressed: () => _showDeleteDialog(book),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined, color: Colors.blue, size: 28),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AdminEditBookPage(book: book),
+                                        ),
+                                      ).then((_) => _loadBooks());
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 28),
+                                    onPressed: () => _showDeleteDialog(book),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

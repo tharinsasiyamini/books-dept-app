@@ -121,73 +121,88 @@ class BookDetailsPage extends StatelessWidget {
                 const SizedBox(height: 32),
                 
                 // Add to Cart Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                if (AuthState.isLoggedIn.value && book.stock == 0)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        'Out of Stock',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
                       ),
                     ),
-                    onPressed: () async {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Clear previous
-                      
-                      if (!AuthState.isLoggedIn.value) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text("Login to Purchase Books"),
-                            duration: const Duration(seconds: 4),
-                            action: SnackBarAction(
-                              label: 'LOGIN',
-                              textColor: Colors.pinkAccent,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginPage(),
-                                  ),
-                                );
-                              },
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () async {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Clear previous
+                        
+                        if (!AuthState.isLoggedIn.value) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text("Login to Purchase Books"),
+                              duration: const Duration(seconds: 4),
+                              action: SnackBarAction(
+                                label: 'LOGIN',
+                                textColor: Colors.pinkAccent,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginPage(),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        );
-                        return;
-                      }
+                          );
+                          return;
+                        }
 
-                      try {
-                        final cartId = 'C_${AuthState.currentUser!.userID}';
-                        await DatabaseHelper.instance.addToCart(cartId, book.bookID, 1);
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Added ${book.title} to cart"),
-                            duration: const Duration(seconds: 2),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } catch (e) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Failed to add: $e"),
-                            duration: const Duration(seconds: 3),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      'ADD TO CART',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        try {
+                          final cartId = 'C_${AuthState.currentUser!.userID}';
+                          await DatabaseHelper.instance.addToCart(cartId, book.bookID, 1);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Added ${book.title} to cart"),
+                              duration: const Duration(seconds: 2),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to add: $e"),
+                              duration: const Duration(seconds: 3),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'ADD TO CART',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           );

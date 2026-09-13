@@ -3,6 +3,7 @@ import '../widgets/custom_app_bar.dart';
 import '../state/auth_state.dart';
 import '../services/database_helper.dart';
 import 'register_page.dart';
+import 'root_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,7 +39,11 @@ class _LoginPageState extends State<LoginPage> {
       if (user != null && user.password == password) {
         AuthState.login(user);
         if (mounted) {
-          Navigator.popUntil(context, (route) => route.isFirst);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const RootPage()),
+            (route) => false,
+          );
         }
       } else {
         if (mounted) {

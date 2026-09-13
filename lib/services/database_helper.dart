@@ -593,6 +593,33 @@ CREATE TABLE Notification (
           subtotal: itemSubtotal,
         );
         await txn.insert('OrderItem', orderItem.toMap());
+
+        // Decrement stock
+        final bookMaps = await txn.query('Book', where: 'BookID = ?', whereArgs: [bookId]);
+        if (bookMaps.isNotEmpty) {
+          int currentStock = bookMaps.first['Stock'] as int;
+          int newStock = currentStock - qty;
+          if (newStock < 0) newStock = 0; // Prevent negative stock
+          await txn.update('Book', {'Stock': newStock}, where: 'BookID = ?', whereArgs: [bookId]);
+
+          // Low stock notification
+          if (newStock <= 5 && currentStock > 5) {
+            // Create notification for staff and admin
+            final staffMaps = await txn.query('User', where: 'Role = ? OR Role = ?', whereArgs: ['Staff', 'Admin']);
+            for (var staff in staffMaps) {
+              final notificationId = 'NOTIF_${DateTime.now().millisecondsSinceEpoch}_${math.Random().nextInt(1000)}';
+              final bookTitle = bookMaps.first['Title'] as String;
+              final notification = AppNotification(
+                notificationID: notificationId,
+                userID: staff['UserID'] as String,
+                message: 'Low stock alert: $bookTitle has only $newStock items left.',
+                date: DateTime.now().toIso8601String(),
+                isRead: 0,
+              );
+              await txn.insert('Notification', notification.toMap());
+            }
+          }
+        }
       }
 
       // 5. Clear Cart Items
@@ -743,6 +770,16 @@ CREATE TABLE Notification (
   Future<void> createBook(Book book) async {
     final db = await instance.database;
     await db.insert('Book', book.toMap());
+  }
+
+  Future<void> updateBook(Book book) async {
+    final db = await instance.database;
+    await db.update(
+      'Book',
+      book.toMap(),
+      where: 'BookID = ?',
+      whereArgs: [book.bookID],
+    );
   }
 
   Future<void> deleteBook(String bookID) async {
